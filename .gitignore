@@ -2,7 +2,10 @@
 *.class
 
 # Log file
+.env
 *.log
+.idea/
+target/
 
 # BlueJ files
 *.ctxt
