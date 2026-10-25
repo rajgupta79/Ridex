@@ -37,3 +37,28 @@ build/
 cp.txt
 # Local scripts scratch output
 scripts/*-out*.txt
+
+### Secrets / environment ###
+# Never commit real secrets. Override config via these locally-ignored files.
+.env
+.env.*
+*.env
+!.env.example
+secrets.properties
+application-local.yaml
+application-local.yml
+application-secret.yaml
+application-secret.yml
+
+### Logs ###
+*.log
+logs/
+
+### OS files ###
+.DS_Store
+Thumbs.db
+desktop.ini
+
+### Misc editor ###
+*.swp
+*~
