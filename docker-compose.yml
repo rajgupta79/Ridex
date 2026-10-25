@@ -1,0 +1,38 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: ridex-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      # Local-dev credentials only. Never commit real secrets.
+      MONGO_INITDB_ROOT_USERNAME: ridex
+      MONGO_INITDB_ROOT_PASSWORD: ridex_dev_pw
+      MONGO_INITDB_DATABASE: ridex
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Optional web UI for inspecting the database during development.
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: ridex-mongo-express
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ridex
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ridex_dev_pw
+      ME_CONFIG_MONGODB_URL: mongodb://ridex:ridex_dev_pw@mongo:27017/
+      ME_CONFIG_BASICAUTH: "false"
+
+volumes:
+  mongo_data:

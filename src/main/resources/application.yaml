@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: ridex
+  data:
+    mongodb:
+      # Overridable via env var. Defaults match docker-compose.yml for local dev.
+      uri: ${MONGODB_URI:mongodb://ridex:ridex_dev_pw@localhost:27017/ridex?authSource=admin}
+      auto-index-creation: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+# --- Application-specific settings ---
+ridex:
+  jwt:
+    # Local-dev secret only. Override with env var JWT_SECRET in any real environment.
+    # Must be at least 32 bytes (256 bits) for HS256.
+    secret: ${JWT_SECRET:change-me-in-prod-this-is-a-dev-only-secret-key-32b+}
+    # Token lifetime in milliseconds (default 24h).
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+    issuer: ridex
+  admin:
+    # A bootstrap admin is seeded on startup if no admin exists.
+    bootstrap-email: ${ADMIN_EMAIL:admin@ridex.local}
+    bootstrap-password: ${ADMIN_PASSWORD:admin12345}
+  matching:
+    # How far to search for nearby drivers, in kilometers.
+    search-radius-km: ${MATCH_RADIUS_KM:5.0}
+    # Seconds a driver has to respond to a ride offer before it moves to the next.
+    offer-timeout-seconds: ${MATCH_OFFER_TIMEOUT:15}
+  pricing:
+    base-fare: ${PRICE_BASE:50.0}
+    per-km: ${PRICE_PER_KM:12.0}
+    # Surge kicks in when nearby available drivers are scarce.
+    surge-threshold-drivers: ${PRICE_SURGE_THRESHOLD:3}
+    surge-multiplier: ${PRICE_SURGE_MULT:1.5}
+  pooling:
+    max-riders-per-cab: ${POOL_MAX_RIDERS:3}
+    # Max extra distance (km) a detour may add for a shared ride.
+    max-detour-km: ${POOL_MAX_DETOUR_KM:2.0}
+
+# Swagger / OpenAPI
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+
+# Actuator: expose health for local checks and load-test monitoring.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    com.ridex: DEBUG
